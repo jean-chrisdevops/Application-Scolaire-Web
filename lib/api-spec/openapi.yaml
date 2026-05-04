@@ -1,0 +1,950 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API de gestion des heures des enseignants du supérieur
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentification et session
+  - name: utilisateurs
+    description: Gestion des comptes utilisateurs (Admin)
+  - name: parametres
+    description: Paramètres académiques et financiers (Admin)
+  - name: enseignants
+    description: Gestion des enseignants
+  - name: matieres
+    description: Gestion des matières
+  - name: heures
+    description: Saisie et validation des heures effectuées
+  - name: tableauBord
+    description: Tableaux de bord et statistiques
+  - name: exports
+    description: Exports PDF et Excel
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/connexion:
+    post:
+      operationId: connecter
+      tags: [auth]
+      summary: Connexion (Admin / RH / Enseignant)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnexionRequete"
+      responses:
+        "200":
+          description: Connecté
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Utilisateur"
+        "401":
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErreurReponse"
+
+  /auth/deconnexion:
+    post:
+      operationId: deconnecter
+      tags: [auth]
+      summary: Déconnexion
+      responses:
+        "204":
+          description: Déconnecté
+
+  /auth/moi:
+    get:
+      operationId: obtenirUtilisateurCourant
+      tags: [auth]
+      summary: Récupère l'utilisateur courant
+      responses:
+        "200":
+          description: Utilisateur connecté
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Utilisateur"
+        "401":
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErreurReponse"
+
+  /utilisateurs:
+    get:
+      operationId: listerUtilisateurs
+      tags: [utilisateurs]
+      summary: Liste tous les utilisateurs (Admin)
+      responses:
+        "200":
+          description: Liste des utilisateurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Utilisateur"
+    post:
+      operationId: creerUtilisateur
+      tags: [utilisateurs]
+      summary: Crée un compte utilisateur (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreerUtilisateurRequete"
+      responses:
+        "201":
+          description: Utilisateur créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Utilisateur"
+
+  /utilisateurs/{id}:
+    patch:
+      operationId: modifierUtilisateur
+      tags: [utilisateurs]
+      summary: Modifie un utilisateur
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifierUtilisateurRequete"
+      responses:
+        "200":
+          description: Utilisateur modifié
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Utilisateur"
+    delete:
+      operationId: supprimerUtilisateur
+      tags: [utilisateurs]
+      summary: Supprime un utilisateur
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      responses:
+        "204":
+          description: Supprimé
+
+  /parametres:
+    get:
+      operationId: obtenirParametres
+      tags: [parametres]
+      summary: Récupère les paramètres académiques et financiers
+      responses:
+        "200":
+          description: Paramètres
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Parametres"
+    patch:
+      operationId: modifierParametres
+      tags: [parametres]
+      summary: Modifie les paramètres
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifierParametresRequete"
+      responses:
+        "200":
+          description: Paramètres modifiés
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Parametres"
+
+  /enseignants:
+    get:
+      operationId: listerEnseignants
+      tags: [enseignants]
+      summary: Liste tous les enseignants
+      responses:
+        "200":
+          description: Liste des enseignants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Enseignant"
+    post:
+      operationId: creerEnseignant
+      tags: [enseignants]
+      summary: Crée un enseignant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreerEnseignantRequete"
+      responses:
+        "201":
+          description: Enseignant créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enseignant"
+
+  /enseignants/{id}:
+    get:
+      operationId: obtenirEnseignant
+      tags: [enseignants]
+      summary: Récupère un enseignant
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      responses:
+        "200":
+          description: Enseignant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enseignant"
+        "404":
+          description: Introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErreurReponse"
+    patch:
+      operationId: modifierEnseignant
+      tags: [enseignants]
+      summary: Modifie un enseignant
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifierEnseignantRequete"
+      responses:
+        "200":
+          description: Enseignant modifié
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enseignant"
+    delete:
+      operationId: supprimerEnseignant
+      tags: [enseignants]
+      summary: Supprime un enseignant
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      responses:
+        "204":
+          description: Supprimé
+
+  /enseignants/{id}/recapitulatif:
+    get:
+      operationId: obtenirRecapitulatifEnseignant
+      tags: [enseignants]
+      summary: Récapitulatif complet (heures, montants) d'un enseignant
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      responses:
+        "200":
+          description: Récapitulatif
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecapitulatifEnseignant"
+
+  /matieres:
+    get:
+      operationId: listerMatieres
+      tags: [matieres]
+      summary: Liste toutes les matières
+      responses:
+        "200":
+          description: Liste des matières
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Matiere"
+    post:
+      operationId: creerMatiere
+      tags: [matieres]
+      summary: Crée une matière
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreerMatiereRequete"
+      responses:
+        "201":
+          description: Matière créée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Matiere"
+
+  /matieres/{id}:
+    patch:
+      operationId: modifierMatiere
+      tags: [matieres]
+      summary: Modifie une matière
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifierMatiereRequete"
+      responses:
+        "200":
+          description: Matière modifiée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Matiere"
+    delete:
+      operationId: supprimerMatiere
+      tags: [matieres]
+      summary: Supprime une matière
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      responses:
+        "204":
+          description: Supprimée
+
+  /heures:
+    get:
+      operationId: listerHeures
+      tags: [heures]
+      summary: Liste les heures (filtrable par enseignant)
+      parameters:
+        - in: query
+          name: enseignantId
+          schema:
+            type: integer
+          required: false
+      responses:
+        "200":
+          description: Liste des heures
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Heure"
+    post:
+      operationId: creerHeure
+      tags: [heures]
+      summary: Saisit une nouvelle heure
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreerHeureRequete"
+      responses:
+        "201":
+          description: Heure créée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Heure"
+
+  /heures/{id}:
+    patch:
+      operationId: modifierHeure
+      tags: [heures]
+      summary: Modifie une heure
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifierHeureRequete"
+      responses:
+        "200":
+          description: Heure modifiée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Heure"
+    delete:
+      operationId: supprimerHeure
+      tags: [heures]
+      summary: Supprime une heure
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      responses:
+        "204":
+          description: Supprimée
+
+  /heures/{id}/valider:
+    patch:
+      operationId: validerHeure
+      tags: [heures]
+      summary: Valide ou invalide une heure (RH)
+      parameters:
+        - $ref: "#/components/parameters/IdEntier"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValiderHeureRequete"
+      responses:
+        "200":
+          description: Heure mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Heure"
+
+  /tableau-bord/admin:
+    get:
+      operationId: obtenirTableauBordAdmin
+      tags: [tableauBord]
+      summary: Tableau de bord administrateur
+      responses:
+        "200":
+          description: Tableau de bord
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableauBordAdmin"
+
+  /tableau-bord/rh:
+    get:
+      operationId: obtenirTableauBordRh
+      tags: [tableauBord]
+      summary: Tableau de bord ressources humaines
+      responses:
+        "200":
+          description: Tableau de bord
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableauBordRh"
+
+  /tableau-bord/enseignant:
+    get:
+      operationId: obtenirTableauBordEnseignant
+      tags: [tableauBord]
+      summary: Tableau de bord pour l'enseignant courant
+      responses:
+        "200":
+          description: Tableau de bord enseignant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecapitulatifEnseignant"
+
+  /statistiques/departements:
+    get:
+      operationId: obtenirStatistiquesDepartements
+      tags: [tableauBord]
+      summary: Heures totales par département
+      responses:
+        "200":
+          description: Statistiques par département
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StatistiqueDepartement"
+
+  /statistiques/depassements:
+    get:
+      operationId: obtenirEnseignantsEnDepassement
+      tags: [tableauBord]
+      summary: Liste des enseignants en dépassement d'heures
+      responses:
+        "200":
+          description: Liste des enseignants en dépassement
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecapitulatifEnseignant"
+
+  /statistiques/filieres:
+    get:
+      operationId: obtenirStatistiquesFilieres
+      tags: [tableauBord]
+      summary: Répartition des heures par filière
+      responses:
+        "200":
+          description: Statistiques par filière
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StatistiqueFiliere"
+
+  /statistiques/mensuel:
+    get:
+      operationId: obtenirStatistiquesMensuelles
+      tags: [tableauBord]
+      summary: Statistiques mensuelles (12 derniers mois)
+      responses:
+        "200":
+          description: Statistiques mensuelles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StatistiqueMensuelle"
+
+components:
+  parameters:
+    IdEntier:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    ErreurReponse:
+      type: object
+      properties:
+        erreur:
+          type: string
+      required: [erreur]
+
+    RoleUtilisateur:
+      type: string
+      enum: [admin, rh, enseignant]
+
+    GradeEnseignant:
+      type: string
+      enum: [Assistant, MaitreAssistant, Professeur, Autre]
+
+    StatutEnseignant:
+      type: string
+      enum: [Permanent, Vacataire]
+
+    NiveauMatiere:
+      type: string
+      enum: [L1, L2, L3, M1, M2]
+
+    TypeHeure:
+      type: string
+      enum: [CM, TD, TP]
+
+    Utilisateur:
+      type: object
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        nomComplet: { type: string }
+        role:
+          $ref: "#/components/schemas/RoleUtilisateur"
+        enseignantId:
+          type: ["integer", "null"]
+        creeLe: { type: string, format: date-time }
+      required: [id, email, nomComplet, role, enseignantId, creeLe]
+
+    ConnexionRequete:
+      type: object
+      properties:
+        email: { type: string }
+        motDePasse: { type: string }
+      required: [email, motDePasse]
+
+    CreerUtilisateurRequete:
+      type: object
+      properties:
+        email: { type: string }
+        nomComplet: { type: string }
+        motDePasse: { type: string }
+        role:
+          $ref: "#/components/schemas/RoleUtilisateur"
+        enseignantId:
+          type: ["integer", "null"]
+      required: [email, nomComplet, motDePasse, role]
+
+    ModifierUtilisateurRequete:
+      type: object
+      properties:
+        email: { type: string }
+        nomComplet: { type: string }
+        motDePasse: { type: string }
+        role:
+          $ref: "#/components/schemas/RoleUtilisateur"
+        enseignantId:
+          type: ["integer", "null"]
+
+    Parametres:
+      type: object
+      properties:
+        id: { type: integer }
+        anneeAcademique: { type: string }
+        tauxHoraireCm: { type: number }
+        tauxHoraireTd: { type: number }
+        tauxHoraireTp: { type: number }
+        equivalenceCm: { type: number }
+        equivalenceTd: { type: number }
+        equivalenceTp: { type: number }
+        seuilHeuresContractuelles: { type: number }
+        misAJourLe: { type: string, format: date-time }
+      required:
+        - id
+        - anneeAcademique
+        - tauxHoraireCm
+        - tauxHoraireTd
+        - tauxHoraireTp
+        - equivalenceCm
+        - equivalenceTd
+        - equivalenceTp
+        - seuilHeuresContractuelles
+        - misAJourLe
+
+    ModifierParametresRequete:
+      type: object
+      properties:
+        anneeAcademique: { type: string }
+        tauxHoraireCm: { type: number }
+        tauxHoraireTd: { type: number }
+        tauxHoraireTp: { type: number }
+        equivalenceCm: { type: number }
+        equivalenceTd: { type: number }
+        equivalenceTp: { type: number }
+        seuilHeuresContractuelles: { type: number }
+
+    Enseignant:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+        prenom: { type: string }
+        email: { type: string }
+        grade:
+          $ref: "#/components/schemas/GradeEnseignant"
+        statut:
+          $ref: "#/components/schemas/StatutEnseignant"
+        departement: { type: string }
+        tauxHoraire: { type: number }
+        creeLe: { type: string, format: date-time }
+      required:
+        - id
+        - nom
+        - prenom
+        - email
+        - grade
+        - statut
+        - departement
+        - tauxHoraire
+        - creeLe
+
+    CreerEnseignantRequete:
+      type: object
+      properties:
+        nom: { type: string }
+        prenom: { type: string }
+        email: { type: string }
+        grade:
+          $ref: "#/components/schemas/GradeEnseignant"
+        statut:
+          $ref: "#/components/schemas/StatutEnseignant"
+        departement: { type: string }
+        tauxHoraire: { type: number }
+      required:
+        - nom
+        - prenom
+        - email
+        - grade
+        - statut
+        - departement
+        - tauxHoraire
+
+    ModifierEnseignantRequete:
+      type: object
+      properties:
+        nom: { type: string }
+        prenom: { type: string }
+        email: { type: string }
+        grade:
+          $ref: "#/components/schemas/GradeEnseignant"
+        statut:
+          $ref: "#/components/schemas/StatutEnseignant"
+        departement: { type: string }
+        tauxHoraire: { type: number }
+
+    Matiere:
+      type: object
+      properties:
+        id: { type: integer }
+        intitule: { type: string }
+        filiere: { type: string }
+        niveau:
+          $ref: "#/components/schemas/NiveauMatiere"
+        volumeHorairePrevu: { type: number }
+        creeLe: { type: string, format: date-time }
+      required:
+        - id
+        - intitule
+        - filiere
+        - niveau
+        - volumeHorairePrevu
+        - creeLe
+
+    CreerMatiereRequete:
+      type: object
+      properties:
+        intitule: { type: string }
+        filiere: { type: string }
+        niveau:
+          $ref: "#/components/schemas/NiveauMatiere"
+        volumeHorairePrevu: { type: number }
+      required: [intitule, filiere, niveau, volumeHorairePrevu]
+
+    ModifierMatiereRequete:
+      type: object
+      properties:
+        intitule: { type: string }
+        filiere: { type: string }
+        niveau:
+          $ref: "#/components/schemas/NiveauMatiere"
+        volumeHorairePrevu: { type: number }
+
+    Heure:
+      type: object
+      properties:
+        id: { type: integer }
+        enseignantId: { type: integer }
+        matiereId: { type: integer }
+        date: { type: string, format: date }
+        type:
+          $ref: "#/components/schemas/TypeHeure"
+        duree: { type: number }
+        salle: { type: string }
+        observations: { type: string }
+        validee: { type: boolean }
+        creeLe: { type: string, format: date-time }
+        nomEnseignant: { type: string }
+        intituleMatiere: { type: string }
+      required:
+        - id
+        - enseignantId
+        - matiereId
+        - date
+        - type
+        - duree
+        - salle
+        - observations
+        - validee
+        - creeLe
+        - nomEnseignant
+        - intituleMatiere
+
+    CreerHeureRequete:
+      type: object
+      properties:
+        enseignantId: { type: integer }
+        matiereId: { type: integer }
+        date: { type: string, format: date }
+        type:
+          $ref: "#/components/schemas/TypeHeure"
+        duree: { type: number }
+        salle: { type: string }
+        observations: { type: string }
+      required: [enseignantId, matiereId, date, type, duree, salle]
+
+    ModifierHeureRequete:
+      type: object
+      properties:
+        matiereId: { type: integer }
+        date: { type: string, format: date }
+        type:
+          $ref: "#/components/schemas/TypeHeure"
+        duree: { type: number }
+        salle: { type: string }
+        observations: { type: string }
+
+    ValiderHeureRequete:
+      type: object
+      properties:
+        validee: { type: boolean }
+      required: [validee]
+
+    RecapMensuel:
+      type: object
+      properties:
+        mois: { type: integer }
+        annee: { type: integer }
+        label: { type: string }
+        heuresCm: { type: number }
+        heuresTd: { type: number }
+        heuresTp: { type: number }
+        heuresEquivalentTd: { type: number }
+        heuresNormales: { type: number }
+        heuresComplementaires: { type: number }
+        montantNormal: { type: number }
+        montantComplementaire: { type: number }
+        montantTotal: { type: number }
+      required:
+        - mois
+        - annee
+        - label
+        - heuresCm
+        - heuresTd
+        - heuresTp
+        - heuresEquivalentTd
+        - heuresNormales
+        - heuresComplementaires
+        - montantNormal
+        - montantComplementaire
+        - montantTotal
+
+    RecapitulatifEnseignant:
+      type: object
+      properties:
+        enseignant:
+          $ref: "#/components/schemas/Enseignant"
+        totalHeuresCm: { type: number }
+        totalHeuresTd: { type: number }
+        totalHeuresTp: { type: number }
+        totalHeuresEquivalentTd: { type: number }
+        heuresContractuelles: { type: number }
+        heuresComplementaires: { type: number }
+        montantNormal: { type: number }
+        montantComplementaire: { type: number }
+        montantTotal: { type: number }
+        nombreSeances: { type: integer }
+        heuresValidees: { type: number }
+        heuresEnAttente: { type: number }
+        recapMensuel:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecapMensuel"
+      required:
+        - enseignant
+        - totalHeuresCm
+        - totalHeuresTd
+        - totalHeuresTp
+        - totalHeuresEquivalentTd
+        - heuresContractuelles
+        - heuresComplementaires
+        - montantNormal
+        - montantComplementaire
+        - montantTotal
+        - nombreSeances
+        - heuresValidees
+        - heuresEnAttente
+        - recapMensuel
+
+    TableauBordAdmin:
+      type: object
+      properties:
+        nombreUtilisateurs: { type: integer }
+        nombreEnseignants: { type: integer }
+        nombreMatieres: { type: integer }
+        anneeAcademique: { type: string }
+        masseSalarialeEstimee: { type: number }
+        repartitionRoles:
+          type: array
+          items:
+            type: object
+            properties:
+              role: { $ref: "#/components/schemas/RoleUtilisateur" }
+              nombre: { type: integer }
+            required: [role, nombre]
+      required:
+        - nombreUtilisateurs
+        - nombreEnseignants
+        - nombreMatieres
+        - anneeAcademique
+        - masseSalarialeEstimee
+        - repartitionRoles
+
+    TableauBordRh:
+      type: object
+      properties:
+        totalHeuresSaisies: { type: number }
+        totalHeuresValidees: { type: number }
+        totalHeuresEnAttente: { type: number }
+        nombreEnseignantsActifs: { type: integer }
+        nombreEnseignantsEnDepassement: { type: integer }
+        masseSalariale: { type: number }
+        derniereActivite:
+          type: array
+          items:
+            $ref: "#/components/schemas/Heure"
+      required:
+        - totalHeuresSaisies
+        - totalHeuresValidees
+        - totalHeuresEnAttente
+        - nombreEnseignantsActifs
+        - nombreEnseignantsEnDepassement
+        - masseSalariale
+        - derniereActivite
+
+    StatistiqueDepartement:
+      type: object
+      properties:
+        departement: { type: string }
+        totalHeures: { type: number }
+        nombreEnseignants: { type: integer }
+        masseSalariale: { type: number }
+      required: [departement, totalHeures, nombreEnseignants, masseSalariale]
+
+    StatistiqueFiliere:
+      type: object
+      properties:
+        filiere: { type: string }
+        totalHeures: { type: number }
+        nombreMatieres: { type: integer }
+      required: [filiere, totalHeures, nombreMatieres]
+
+    StatistiqueMensuelle:
+      type: object
+      properties:
+        mois: { type: string }
+        totalHeures: { type: number }
+        nombreSeances: { type: integer }
+      required: [mois, totalHeures, nombreSeances]
