@@ -1,0 +1,115 @@
+CAHIER DE CHARGES
+Application de gestion des heures des enseignants du supérieur
+1. Contexte et justification
+Les établissements d’enseignement supérieur doivent gérer :
+Les volumes horaires par enseignant
+Les différents types d’heures (CM, TD, TP)
+Les charges administratives
+Le suivi des dépassements
+Le calcul des heures complémentaires
+La préparation des états de paiement
+Actuellement, ces opérations sont souvent faites sous Excel ou manuellement, ce qui entraîne :
+Des erreurs de calcul
+Un manque de traçabilité
+Des retards dans les paiements
+Une difficulté de suivi global
+L’application doit automatiser et sécuriser ce processus.
+2. Objectifs du projet
+Mettre en place une application permettant :
+L’enregistrement des enseignants
+La planification et le suivi des heures effectuées
+Le calcul automatique des volumes horaires
+La génération d’états récapitulatifs
+Le calcul des heures complémentaires
+L’exportation des données (PDF / Excel)
+3. Utilisateurs concernés
+3.1 Administrateur
+Gestion des utilisateurs
+Paramétrage de l’année académique
+Définition des taux horaires
+3.2 Service des ressources humaines
+Saisie et validation des heures
+Consultation des statistiques
+Génération des états de paiement
+3.3 Enseignant
+Consultation de ses heures
+Téléchargement de son récapitulatif
+4. Fonctionnalités attendues
+4.1 Gestion des enseignants
+Création / modification / suppression
+Informations : Nom et prénom, Grade (Assistant, Maître-Assistant, Professeur et Autres), Statut (Permanent / Vacataire), Département, Taux horaire.
+4.2 Gestion des matières
+Intitulé du cours
+Filière
+Niveau (L1, L2, L3, M1, M2)
+Volume horaire prévu
+4.3 Gestion des heures effectuées
+Date du cours
+Type d’heure (CM, TD, TP)
+Durée
+Salle
+Observations
+Le système doit : Cumuler automatiquement les heures, distinguer heures normales et complémentaires, calculer les équivalences (ex : 1h CM = 1.5h TD si paramétré).
+4.4 Calcul automatique
+L’application doit calculer :
+Total des heures par enseignant
+Total par type (CM / TD / TP)
+Heures contractuelles
+Heures complémentaires
+Montant total à payer
+4.5 Tableaux de bord
+Heures totales par département
+Enseignants en dépassement
+Répartition des heures par filière
+Statistiques mensuelles
+4.6 États et exports
+Fiche individuelle enseignant
+État global des heures
+État pour la comptabilité
+Export Excel
+Export PDF
+5. Contraintes techniques
+Application web recommandée
+Base de données relationnelle (MySQL / PostgreSQL)
+Authentification sécurisée
+Sauvegarde automatique
+Gestion des rôles et permission
+Interface responsive
+6. Sécurité
+Connexion par identifiant et mot de passe
+Gestion des droits par profil
+Journal des actions (log des modifications)
+Protection contre accès non autorisé
+Historique sur plusieurs années académiques
+7. Livrables attendus
+Le projet consiste à développer une application web full-stack basée sur JavaScript (front-end et back-end). Les éléments suivants doivent être fournis lors de la remise :
+Application full-stack fonctionnelle développée en JavaScript (interface utilisateur et serveur).
+Base de données opérationnelle intégrée à l’application.
+Documentation technique décrivant l’architecture, les technologies utilisées et les principales fonctionnalités.
+Guide utilisateur expliquant comment installer et utiliser l’application.
+Rapport de projet présentant le contexte, les objectifs, la méthodologie et les résultats obtenus.
+Lien vers une vidéo de présentation démontrant le fonctionnement de l’application.
+
+Fais tout ce qui doit etre fait puis deploie l'application que l'application reflete des couleurs bleues et blanches. Que visuellement l'application soit irreprochable 
+il doit avoir une page de connexion et sur cette page de connexion on peot soit se connecter en tant qu'administrateur ou ressources humaines ou enseignant et une fois connecté parmi l'une des pages voici ce que chacun peut faire 
+
+1. Administrateur
+C'est le gestionnaire du système. Ses actions portent sur la structure et la configuration globale.
+Gestion des utilisateurs : Créer, modifier ou supprimer les comptes d'accès pour les RH et les enseignants.
+Paramétrage académique : Définir l'année en cours (ex: 2025-2026).
+Configuration financière : Définir et modifier les taux horaires qui serviront de base aux calculs de paiement.
+Gestion de la sécurité : Contrôler les rôles et les permissions.                                 
+
+
+2. Service des Ressources Humaines (RH)
+C'est le profil opérationnel et de contrôle. Il fait le pont entre la pédagogie et la comptabilité.
+Saisie et Validation : Enregistrer les heures effectuées et, surtout, les valider pour qu'elles soient prises en compte.
+Gestion administrative : Gérer les fiches des enseignants (grades, statuts permanent/vacataire, départements).
+Analyse et Statistiques : Consulter les tableaux de bord (dépassements d'heures, répartition par filière).
+Exportation comptable : Générer les états de paiement et les récapitulatifs globaux (Excel/PDF) pour la direction financière.
+
+3. Enseignant
+C'est un profil de consultation avec un accès restreint à ses propres données uniquement.
+Consultation personnelle : Visualiser uniquement son propre cumul d'heures (CM, TD, TP).
+Suivi individuel : Vérifier ses heures normales vs heures complémentaires.
+Téléchargement : Récupérer sa propre fiche individuelle ou son récapitulatif au format PDF/Excel.
